@@ -17,6 +17,8 @@ def basic_stats(filename):
     throwaways = {}
     touches = {}
     pickups = {}
+    points = {}
+    points_roster = {}
 
     with open(filename, 'r') as f:
 
@@ -24,14 +26,17 @@ def basic_stats(filename):
         names = f.readline().split(',')
         # get the indices of the columns of interest
         action_idx = names.index('Action')
+        datetime_idx = names.index('Date/Time')
         defender_idx = names.index('Defender')
         event_type_idx = names.index('Event Type')
         opponent_idx = names.index('Opponent')
         passer_idx = names.index('Passer')
-        receiver_idx = names.index('Receiver')
         player0_idx = names.index('Player 0')
         player7_idx = names.index('Player 7')
-        datetime_idx = names.index('Date/Time')
+        linenumber_idx = names.index('Line')
+        ourscore_idx = names.index('Our Score - End of Point')
+        receiver_idx = names.index('Receiver')
+        theirscore_idx = names.index('Their Score - End of Point')
 
         # load the rest of the file into a list
         data = [row.split(',') for row in f.readlines()]
@@ -48,9 +53,11 @@ def basic_stats(filename):
 
             datetime = row[datetime_idx]
             opponent = row[opponent_idx]
+            linenumber = row[linenumber_idx]
             game_name = '%s - %s' % (opponent, datetime)
+            linenumber_name = '%s - %s - %s:% s' % (
+                opponent, datetime, row[ourscore_idx], row[theirscore_idx])
             line = row[player0_idx:player7_idx]
-
 
             # calculate number of games player has played in
             for player in line:
@@ -58,6 +65,9 @@ def basic_stats(filename):
                 if player not in game:
                     games[player] = games.get(player, 0) + 1
                     games_roster[game_name] = game + [player]
+                player_points = points_roster.get(player, [])
+                if linenumber_name not in player_points:
+                    points_roster[player] = player_points + [linenumber_name]
 
             if action == 'Callahan':
                 ds[defender] = ds.get(defender, 0) + 1
@@ -86,6 +96,13 @@ def basic_stats(filename):
 
             elif action == 'Throwaway':
                 throwaways[passer] = throwaways.get(passer, 0) + 1
+
+        # calculate how many points each player played
+        for name in points_roster.keys():
+            points[name] = len(points_roster[name])
+
+        for name in sorted(points.keys()):
+            print('%s %s' % (name.ljust(10), points[name]))
 
         # handle case where first entry in data file was a pickup
         if data[0][event_type_idx] == 'Offense':
@@ -116,6 +133,7 @@ def basic_stats(filename):
             'Throwaways':throwaways,
             'Touches':touches,
             'Pickups':pickups,
+            'Points':points,
             'Games':games,
             }
 
@@ -181,3 +199,8 @@ def setup_stats(filename):
         scores['Ratio'] = ratio
 
         return scores
+
+
+if __name__ == '__main__':
+
+    basic_stats('Zen-stats.csv')

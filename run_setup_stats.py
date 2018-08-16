@@ -2,6 +2,8 @@ from stats import basic_stats, setup_stats
 
 filename = 'Zen-stats.csv'
 
+normalize_by = 'Points'  # 'Games'  # 'Touches'
+
 basic_data = basic_stats(filename)
 scores = setup_stats(filename)
 
@@ -15,7 +17,8 @@ for subplot_idx, key in enumerate(scores.keys()):
     if key is not 'Ratio':
         # normalize by games
         for name in score_dict.keys():
-            score_dict[name] = score_dict[name] / basic_data['Games'][name]
+            score_dict[name] = (
+                score_dict[name] / basic_data[normalize_by][name])
     sorted_score_list = sorted(score_dict.items(), key=lambda kv: kv[1])
 
     names = []
