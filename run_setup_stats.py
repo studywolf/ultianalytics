@@ -1,15 +1,24 @@
+import matplotlib.pyplot as plt
+
 from stats import basic_stats, setup_stats
 
-filename = 'Zen-stats.csv'
+filename = 'Zen-stats1.csv'
 
 normalize_by = 'Points'  # 'Games'  # 'Touches'
 
 basic_data = basic_stats(filename)
 scores = setup_stats(filename)
 
-import matplotlib.pyplot as plt
+color_cycle = plt.gca()._get_lines.prop_cycler
+plt.close()
+name_colors = {}
+for ii, name in enumerate(basic_data['Touches'].keys()):
+    name_colors[name] = next(color_cycle)['color']
+
+print(name_colors)
+
 plt.figure(figsize=(10, 8))
-for subplot_idx, key in enumerate(scores.keys()):
+for subplot_idx, key in enumerate(sorted(scores.keys())):
     print('\n----------------')
     print('Scores for setting up %ss \n' % key)
     score_dict = scores[key]
@@ -28,7 +37,7 @@ for subplot_idx, key in enumerate(scores.keys()):
         names.append(sorted_score_list[ii][0])
         score = sorted_score_list[ii][1]
         print('%s: %.3f' % (names[-1].ljust(10), score))
-        plt.bar(ii, score)
+        plt.bar(ii, score, color=name_colors[names[-1]])
     plt.xticks(range(len(sorted_score_list)), names, rotation=70)
     plt.title({'Goal':'Setting up Assists',
                 'Throwaway':'Setting up Throwaways',
