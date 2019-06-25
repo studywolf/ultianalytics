@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 
 from stats import basic_stats, setup_stats
 
-filename = 'Zen-stats1.csv'
+filename = 'Zen-stats2.csv'
 
-normalize_by = 'Points'  # 'Games'  # 'Touches'
+normalize_by = 'Points'
 
 basic_data = basic_stats(filename)
-scores = setup_stats(filename)
+scores = setup_stats(filename, plot_weighting=True)
 
 color_cycle = plt.gca()._get_lines.prop_cycler
 plt.close()
@@ -24,7 +24,7 @@ for subplot_idx, key in enumerate(sorted(scores.keys())):
     score_dict = scores[key]
     del score_dict['Anonymous']
     if key is not 'Ratio':
-        # normalize by games
+        # normalize
         for name in score_dict.keys():
             score_dict[name] = (
                 score_dict[name] / basic_data[normalize_by][name])

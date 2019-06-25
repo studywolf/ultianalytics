@@ -2,6 +2,9 @@
 catches, callahans all seem to be correct. Could be pickup calculations
 missing some instances."""
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 def basic_stats(filename):
     data = []
 
@@ -138,7 +141,7 @@ def basic_stats(filename):
             }
 
 
-def setup_stats(filename):
+def setup_stats(filename, plot_weighting=False):
     data = []
 
     # set up dictionaries to record player scores
@@ -150,9 +153,19 @@ def setup_stats(filename):
     # assign weights to setting up different actions, the player at index
     # [action - ii] gets weight ** (ii + 1) added to their score
     weights = {
-        'Goal':0.9,
-        'Throwaway':0.8,
+        'Goal':0.8,
+        'Throwaway':0.5,
     }
+
+    if plot_weighting:
+        x = np.arange(20)
+        for key in weights.keys():
+            plt.plot(x, weights[key]**x, label=key)
+        plt.legend()
+        plt.ylabel('Reward / blame weighting for event')
+        plt.xlabel('Number of throws before event')
+        plt.tight_layout()
+        plt.show()
 
     with open(filename, 'r') as f:
 
